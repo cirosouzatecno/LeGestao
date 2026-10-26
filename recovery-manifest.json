@@ -1,0 +1,8 @@
+{
+  "project": "legestao",
+  "sourceDeployment": "https://legestao-p3o53wlym-cirosouzatecno.vercel.app",
+  "previousDeployment": "https://legestao-q9f0gdhbm-cirosouzatecno.vercel.app",
+  "sourceDeploymentCreatedAt": "2026-10-23T19:19:55Z",
+  "previousDeploymentCreatedAt": "2026-10-23T19:12:38Z",
+  "note": "Recovered public production artifacts. The Vercel deployment does not expose the original source tree; JavaScript and CSS are production bundles."
+}
