@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import { ThemeToggle } from '@/components/theme-toggle'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -30,8 +31,8 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light dark',
-  themeColor: '#203d2b',
+  colorScheme: 'dark light',
+  themeColor: '#080b09',
 }
 
 export default function RootLayout({
@@ -40,17 +41,26 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" data-theme="dark" className="dark">
       <head>
         <link rel="stylesheet" href="/assets/index-18acEcHu.css" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('legestao_theme')||'dark';document.documentElement.setAttribute('data-theme',t);if(t==='dark'){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}}catch(e){document.documentElement.setAttribute('data-theme','dark');document.documentElement.classList.add('dark')}})();`,
+          }}
+        />
       </head>
       <body>
         <div id="root" suppressHydrationWarning>
           {children}
+        </div>
+        <div className="theme-toggle-fixed-container">
+          <ThemeToggle />
         </div>
         <script type="module" src="/assets/index-CufAODdL.js"></script>
       </body>
     </html>
   )
 }
+
 
