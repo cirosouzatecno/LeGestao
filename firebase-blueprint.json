@@ -1,0 +1,85 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Perfil de usuário autenticado no sistema LeGestão",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "ID do usuário no Firebase Auth" },
+        "email": { "type": "string", "format": "email", "description": "Email corporativo ou pessoal" },
+        "displayName": { "type": "string", "maxLength": 100, "description": "Nome completo" },
+        "role": { "type": "string", "enum": ["admin", "manager", "staff"], "description": "Cargo ou função de acesso" },
+        "createdAt": { "type": "string", "description": "Data de criação" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Event": {
+      "title": "Event",
+      "description": "Evento sob gestão Le Jardin / VJ Eventos",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64, "description": "Identificador do evento" },
+        "title": { "type": "string", "maxLength": 120, "description": "Título ou nome do evento" },
+        "clientName": { "type": "string", "maxLength": 100, "description": "Nome do cliente ou contratante" },
+        "date": { "type": "string", "description": "Data prevista do evento" },
+        "location": { "type": "string", "maxLength": 200, "description": "Local de montagem e realização" },
+        "status": { "type": "string", "enum": ["planejamento", "montagem", "realizado", "cancelado"], "description": "Status do evento" },
+        "totalGuests": { "type": "number", "description": "Estimativa de convidados" },
+        "notes": { "type": "string", "maxLength": 1000, "description": "Observações sobre flores, iluminação e equipe" },
+        "createdAt": { "type": "string", "description": "Timestamp de criação" },
+        "updatedAt": { "type": "string", "description": "Timestamp de atualização" }
+      },
+      "required": ["id", "title", "status"]
+    },
+    "InventoryItem": {
+      "title": "InventoryItem",
+      "description": "Item de estoque, decoração ou estrutura floral/cenográfica",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64, "description": "Código do item" },
+        "name": { "type": "string", "maxLength": 100, "description": "Nome do item ou insumo" },
+        "category": { "type": "string", "enum": ["flores", "vasos", "estruturas", "iluminacao", "mobiliario", "outros"], "description": "Categoria de estoque" },
+        "quantity": { "type": "number", "description": "Quantidade atual disponível" },
+        "unit": { "type": "string", "maxLength": 20, "description": "Unidade de medida (un, cx, maço, m)" },
+        "minQuantity": { "type": "number", "description": "Quantidade mínima de alerta" },
+        "location": { "type": "string", "maxLength": 100, "description": "Setor ou galpão de armazenamento" },
+        "notes": { "type": "string", "maxLength": 500, "description": "Instruções de manutenção ou manuseio" },
+        "updatedAt": { "type": "string", "description": "Data da última contagem ou movimentação" }
+      },
+      "required": ["id", "name", "category", "quantity"]
+    },
+    "TeamMember": {
+      "title": "TeamMember",
+      "description": "Membro da equipe operacional, floral ou de produção",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64, "description": "ID do membro da equipe" },
+        "name": { "type": "string", "maxLength": 100, "description": "Nome do colaborador" },
+        "role": { "type": "string", "maxLength": 80, "description": "Especialidade (Florista, Iluminador, Produtor)" },
+        "phone": { "type": "string", "maxLength": 30, "description": "Telefone ou WhatsApp" },
+        "email": { "type": "string", "format": "email", "description": "Email de contato" },
+        "status": { "type": "string", "enum": ["ativo", "em_evento", "indisponivel", "inativo"], "description": "Disponibilidade" },
+        "notes": { "type": "string", "maxLength": 500, "description": "Observações sobre escala ou restrições" }
+      },
+      "required": ["id", "name", "role", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Perfis de usuários do sistema LeGestão"
+    },
+    "/events/{eventId}": {
+      "schema": { "$ref": "#/entities/Event" },
+      "description": "Coleção de eventos corporativos e sociais"
+    },
+    "/inventory/{itemId}": {
+      "schema": { "$ref": "#/entities/InventoryItem" },
+      "description": "Itens de estoque de flores, móveis e equipamentos de eventos"
+    },
+    "/team/{memberId}": {
+      "schema": { "$ref": "#/entities/TeamMember" },
+      "description": "Membros e produtores da equipe Le Jardin e VJ Eventos"
+    }
+  }
+}

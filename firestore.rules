@@ -1,0 +1,106 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == "ciro.souza3@aluno.unip.br" ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if isSignedIn() && (isOwner(userId) || isAdmin());
+      allow create: if isSignedIn() && isOwner(userId) &&
+        incoming().keys().hasAll(['uid', 'email', 'role']) &&
+        incoming().uid == request.auth.uid &&
+        incoming().email is string &&
+        incoming().role in ['admin', 'manager', 'staff'];
+      allow update: if isSignedIn() && (isOwner(userId) || isAdmin()) &&
+        incoming().uid == existing().uid &&
+        (!incoming().diff(existing()).affectedKeys().hasAny(['role']) || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // Admins registry
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Events collection
+    match /events/{eventId} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidId(eventId) &&
+        incoming().keys().hasAll(['id', 'title', 'status']) &&
+        incoming().title is string && incoming().title.size() <= 120 &&
+        incoming().status in ['planejamento', 'montagem', 'realizado', 'cancelado'];
+      allow update: if isSignedIn() && isValidId(eventId) &&
+        incoming().id == existing().id &&
+        incoming().title is string && incoming().title.size() <= 120 &&
+        incoming().status in ['planejamento', 'montagem', 'realizado', 'cancelado'];
+      allow delete: if isAdmin();
+    }
+
+    // Inventory collection
+    match /inventory/{itemId} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidId(itemId) &&
+        incoming().keys().hasAll(['id', 'name', 'category', 'quantity']) &&
+        incoming().name is string && incoming().name.size() <= 100 &&
+        incoming().category in ['flores', 'vasos', 'estruturas', 'iluminacao', 'mobiliario', 'outros'] &&
+        incoming().quantity is number;
+      allow update: if isSignedIn() && isValidId(itemId) &&
+        incoming().id == existing().id &&
+        incoming().name is string && incoming().name.size() <= 100 &&
+        incoming().quantity is number;
+      allow delete: if isAdmin();
+    }
+
+    // Team collection
+    match /team/{memberId} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidId(memberId) &&
+        incoming().keys().hasAll(['id', 'name', 'role', 'status']) &&
+        incoming().name is string && incoming().name.size() <= 100 &&
+        incoming().status in ['ativo', 'em_evento', 'indisponivel', 'inativo'];
+      allow update: if isSignedIn() && isValidId(memberId) &&
+        incoming().id == existing().id &&
+        incoming().name is string && incoming().name.size() <= 100 &&
+        incoming().status in ['ativo', 'em_evento', 'indisponivel', 'inativo'];
+      allow delete: if isAdmin();
+    }
+
+    // Test connection doc
+    match /test/{docId} {
+      allow read: if true;
+    }
+  }
+}
