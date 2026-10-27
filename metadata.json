@@ -1,0 +1,5 @@
+{
+  "name": "LeGestão",
+  "description": "Gestão integrada de eventos, estoque e equipe — Le Jardin e VJ Eventos",
+  "capabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
