@@ -1,14 +1,61 @@
-import { initializeApp, getApps, getApp } from 'firebase/app'
-import { getAuth } from 'firebase/auth'
-import { getFirestore, doc, getDocFromServer } from 'firebase/firestore'
-import firebaseConfig from '../firebase-applet-config.json'
+﻿import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app'
+import { getAuth, type Auth } from 'firebase/auth'
+import { getFirestore, type Firestore, doc, getDocFromServer } from 'firebase/firestore'
 
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig)
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId)
-export const auth = getAuth(app)
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+  firestoreDatabaseId: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID,
+}
+
+let appInstance: FirebaseApp | null = null
+let authInstance: Auth | null = null
+let dbInstance: Firestore | null = null
+
+function getFirebaseApp(): FirebaseApp {
+  if (typeof window === 'undefined') {
+    throw new Error('Firebase initialization only available client-side')
+  }
+  if (!appInstance) {
+    appInstance = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig)
+  }
+  return appInstance
+}
+
+export function getAuthInstance(): Auth {
+  if (!authInstance) {
+    authInstance = getAuth(getFirebaseApp())
+  }
+  return authInstance
+}
+
+export function getDbInstance(): Firestore {
+  if (!dbInstance) {
+    dbInstance = getFirestore(getFirebaseApp(), firebaseConfig.firestoreDatabaseId)
+  }
+  return dbInstance
+}
+
+export const auth = new Proxy({} as Auth, {
+  get(_target, prop) {
+    return getAuthInstance()[prop]
+  }
+})
+
+export const db = new Proxy({} as Firestore, {
+  get(_target, prop) {
+    return getDbInstance()[prop]
+  }
+})
 
 export async function validateFirestoreConnection(): Promise<boolean> {
   try {
+    const db = getDbInstance()
     await getDocFromServer(doc(db, 'test', 'connection'))
     return true
   } catch (error) {
@@ -20,10 +67,11 @@ export async function validateFirestoreConnection(): Promise<boolean> {
 }
 
 if (typeof window !== 'undefined') {
-  ;(window as unknown as { firebaseApp?: typeof app; firebaseAuth?: typeof auth; firebaseDb?: typeof db; firebaseConfig?: typeof firebaseConfig }).firebaseApp = app
-  ;(window as unknown as { firebaseApp?: typeof app; firebaseAuth?: typeof auth; firebaseDb?: typeof db; firebaseConfig?: typeof firebaseConfig }).firebaseAuth = auth
-  ;(window as unknown as { firebaseApp?: typeof app; firebaseAuth?: typeof auth; firebaseDb?: typeof db; firebaseConfig?: typeof firebaseConfig }).firebaseDb = db
-  ;(window as unknown as { firebaseApp?: typeof app; firebaseAuth?: typeof auth; firebaseDb?: typeof db; firebaseConfig?: typeof firebaseConfig }).firebaseConfig = firebaseConfig
+  const app = getFirebaseApp()
+  ;(window as unknown as { firebaseApp?: typeof app; firebaseAuth?: Auth; firebaseDb?: Firestore; firebaseConfig?: typeof firebaseConfig }).firebaseApp = app
+  ;(window as unknown as { firebaseApp?: typeof app; firebaseAuth?: Auth; firebaseDb?: Firestore; firebaseConfig?: typeof firebaseConfig }).firebaseAuth = getAuthInstance()
+  ;(window as unknown as { firebaseApp?: typeof app; firebaseAuth?: Auth; firebaseDb?: Firestore; firebaseConfig?: typeof firebaseConfig }).firebaseDb = getDbInstance()
+  ;(window as unknown as { firebaseApp?: typeof app; firebaseAuth?: Auth; firebaseDb?: Firestore; firebaseConfig?: typeof firebaseConfig }).firebaseConfig = firebaseConfig
 }
 
-export default app
+export default getFirebaseApp

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { FormEvent, useState } from 'react'
 import { FirebaseError } from 'firebase/app'
@@ -69,7 +69,7 @@ export function LoginScreen() {
     <main className="login-screen min-h-screen lg:grid lg:grid-cols-[1.1fr_0.9fr]">
       <section className="login-story hidden min-h-screen flex-col justify-between p-8 lg:flex xl:p-14">
         <div className="login-brands">
-          <img className="login-logo-lejardin" src="/assets/img/logo.png" alt="Le Jardin" />
+          <img className="login-logo-lejardin" src="/assets/img/logo-lejardin.webp" alt="Le Jardin" />
           <span className="login-brand-divider" aria-hidden="true" />
           <img className="login-logo-vj" src="/assets/img/logo-vj.webp" alt="VJ Projetos Especiais Produções" />
         </div>
@@ -93,7 +93,7 @@ export function LoginScreen() {
         <form onSubmit={handleSubmit} className="login-card w-full max-w-md rounded-2xl p-7 sm:p-10">
           <div className="login-mobile-brand mb-8 rounded-xl p-4 lg:hidden">
             <div className="brand-lockup" aria-label="Le Jardin e VJ Eventos">
-              <img className="login-mobile-logo" src="/assets/img/logo.png" alt="Le Jardin" />
+              <img className="login-mobile-logo" src="/assets/img/logo-lejardin.webp" alt="Le Jardin" />
               <img className="login-mobile-logo" src="/assets/img/logo-vj.webp" alt="VJ Eventos" />
             </div>
           </div>
