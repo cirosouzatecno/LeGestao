@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 
 export default function DashboardPage() {
   return (
-    <main className="min-h-screen bg-[#070a08] p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,_#183323_0,_#070a08_38%,_#050705_100%)] px-3 py-3 text-[#e8ebe9] sm:px-5 sm:py-5 lg:px-8 lg:py-8">
+      <div className="mx-auto max-w-[1480px]">
         <DashboardOverview />
       </div>
     </main>

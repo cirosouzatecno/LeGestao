@@ -423,7 +423,7 @@ export function DashboardOverview({ className = '' }: { className?: string }) {
   }
 
   return (
-    <div className={`legestao-dashboard-container bg-[#080b09] text-[#e8ebe9] p-4 sm:p-6 lg:p-8 rounded-2xl border border-[#233127] shadow-2xl relative ${className}`}>
+    <div className={`legestao-dashboard-container min-h-[calc(100vh-1.5rem)] overflow-hidden bg-[#080b09]/95 text-[#e8ebe9] p-4 sm:p-6 lg:p-8 rounded-[1.25rem] border border-[#233127] shadow-[0_24px_80px_rgba(0,0,0,0.35)] relative ${className}`}>
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#16241b] border border-[#c5a059] text-[#f2f5f3] px-5 py-3 rounded-xl shadow-2xl text-xs sm:text-sm font-medium flex items-center gap-3 backdrop-blur-md animate-in fade-in slide-in-from-bottom-4">
@@ -443,15 +443,15 @@ export function DashboardOverview({ className = '' }: { className?: string }) {
               <Sparkles className="w-3 h-3" />
               Painel Operacional
             </span>
-            <span className="flex items-center gap-1 text-[11px] text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 rounded-full font-mono">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Firestore Live
+            <span className={`flex items-center gap-1 text-[11px] border px-2 py-0.5 rounded-full font-mono ${connected ? 'text-emerald-300 bg-emerald-950/60 border-emerald-800/40' : 'text-amber-300 bg-amber-950/40 border-amber-800/40'}`}>
+              <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${connected ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+              {connected ? 'Firestore Live' : 'Modo demonstração'}
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-white tracking-tight">
             Visão Geral LeGestão
           </h1>
-          <p className="text-xs sm:text-sm text-[#94a89a]">
+          <p className="mt-2 max-w-2xl text-xs sm:text-sm leading-relaxed text-[#94a89a]">
             Métricas de eventos em tempo real, monitoramento de acervo floral e estrutura cenográfica.
           </p>
         </div>
