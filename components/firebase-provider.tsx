@@ -5,6 +5,7 @@ import {
   User,
   onAuthStateChanged,
   signInWithPopup,
+  signInWithEmailAndPassword,
   GoogleAuthProvider,
   signOut as fbSignOut,
 } from 'firebase/auth'
@@ -14,6 +15,7 @@ interface FirebaseContextType {
   user: User | null
   loading: boolean
   connected: boolean
+  signInWithEmail: (email: string, password: string) => Promise<void>
   signInWithGoogle: () => Promise<void>
   signOut: () => Promise<void>
 }
@@ -22,6 +24,7 @@ const FirebaseContext = createContext<FirebaseContextType>({
   user: null,
   loading: true,
   connected: false,
+  signInWithEmail: async () => {},
   signInWithGoogle: async () => {},
   signOut: async () => {},
 })
@@ -43,12 +46,12 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const signInWithGoogle = async () => {
-    try {
-      const provider = new GoogleAuthProvider()
-      await signInWithPopup(auth, provider)
-    } catch (err) {
-      console.error('Falha ao autenticar com Google:', err)
-    }
+    const provider = new GoogleAuthProvider()
+    await signInWithPopup(auth, provider)
+  }
+
+  const signInWithEmail = async (email: string, password: string) => {
+    await signInWithEmailAndPassword(auth, email.trim(), password)
   }
 
   const signOut = async () => {
@@ -65,6 +68,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
         user,
         loading,
         connected,
+        signInWithEmail,
         signInWithGoogle,
         signOut,
       }}

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import Script from 'next/script'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { FirebaseProvider } from '@/components/firebase-provider'
 import { GoogleAuthButton } from '@/components/google-auth-button'
@@ -44,10 +45,16 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-BR" data-theme="dark" className="dark">
+    <html
+      lang="pt-BR"
+      data-theme="dark"
+      className="dark"
+      suppressHydrationWarning
+    >
       <head>
-        <link rel="stylesheet" href="/assets/index-18acEcHu.css" />
-        <script
+        <Script
+          id="theme-initializer"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('legestao_theme')||'dark';document.documentElement.setAttribute('data-theme',t);if(t==='dark'){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}}catch(e){document.documentElement.setAttribute('data-theme','dark');document.documentElement.classList.add('dark')}})();`,
           }}
@@ -64,11 +71,8 @@ export default function RootLayout({
             <ThemeToggle />
           </div>
         </FirebaseProvider>
-        <script type="module" src="/assets/index-CufAODdL.js"></script>
       </body>
     </html>
   )
 }
-
-
 
