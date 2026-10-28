@@ -599,6 +599,29 @@ html:not([data-theme="light"]) .login-mobile-brand {
   border: 1px solid #202d24 !important;
 }
 
+.login-mobile-brand .brand-lockup {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.login-mobile-brand .brand-lockup .login-mobile-logo {
+  display: block !important;
+  width: auto !important;
+  height: 100px !important;
+  max-width: calc(50% - 6px) !important;
+  object-fit: contain !important;
+  flex: 0 1 calc(50% - 6px) !important;
+}
+
+.login-mobile-brand .brand-lockup .login-mobile-logo:last-of-type {
+  height: 88px !important;
+  border-radius: 6px !important;
+}
+
 html[data-theme="dark"] .login-bottom,
 html:not([data-theme="light"]) .login-bottom {
   color: #63776a !important;
@@ -980,4 +1003,16 @@ div#root:nth-of-type(2) > main:nth-of-type(1) > section:nth-of-type(2) > form:nt
     padding: 7px 11px !important;
     font-size: 11px !important;
   }
+}
+
+.login-screen .login-mobile-brand .brand-lockup > img.login-mobile-logo {
+  width: auto !important;
+  height: 50px !important;
+  max-width: calc(50% - 6px) !important;
+  flex: 0 1 calc(50% - 6px) !important;
+  object-fit: contain !important;
+}
+
+.login-screen .login-mobile-brand .brand-lockup > img.login-mobile-logo:last-of-type {
+  height: 44px !important;
 }

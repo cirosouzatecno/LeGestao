@@ -85,8 +85,10 @@ export function LoginScreen() {
       <section className="login-form-area flex min-h-screen items-center justify-center p-6 sm:p-10">
         <form onSubmit={handleSubmit} className="login-card w-full max-w-md rounded-2xl p-7 sm:p-10">
           <div className="login-mobile-brand mb-8 rounded-xl p-4 lg:hidden">
-            <strong>Le Gestão</strong>
-            <span>Le Jardin + VJ Eventos</span>
+            <div className="brand-lockup" aria-label="Le Jardin e VJ Eventos">
+              <img className="login-mobile-logo" src="/assets/img/logo.png" alt="Le Jardin" />
+              <img className="login-mobile-logo" src="/assets/img/logo-vj.webp" alt="VJ Eventos" />
+            </div>
           </div>
           <span className="eyebrow">ACESSO RESTRITO</span>
           <h2 className="mt-3 text-3xl font-semibold">Entrar no sistema</h2>

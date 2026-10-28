@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
-import { ThemeToggle } from '@/components/theme-toggle'
 import { FirebaseProvider } from '@/components/firebase-provider'
-import { GoogleAuthButton } from '@/components/google-auth-button'
-import { DashboardModalToggle } from '@/components/dashboard-modal-toggle'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -64,11 +61,6 @@ export default function RootLayout({
         <FirebaseProvider>
           <div id="root" suppressHydrationWarning>
             {children}
-          </div>
-          <div className="theme-toggle-fixed-container flex items-center gap-2">
-            <DashboardModalToggle />
-            <GoogleAuthButton />
-            <ThemeToggle />
           </div>
         </FirebaseProvider>
       </body>
