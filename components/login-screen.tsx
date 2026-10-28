@@ -12,15 +12,22 @@ function getAuthMessage(error: unknown) {
   }
 
   switch (error.code) {
-    case 'auth/invalid-credential':
     case 'auth/invalid-email':
+      return 'Informe um endereço de e-mail válido.'
     case 'auth/user-not-found':
+      return 'Login não encontrado. Verifique o e-mail informado.'
     case 'auth/wrong-password':
-      return 'E-mail ou senha inválidos.'
+      return 'Senha inválida. Verifique sua senha e tente novamente.'
+    case 'auth/invalid-credential':
+      return 'E-mail ou senha inválidos. Confira seus dados e tente novamente.'
     case 'auth/user-disabled':
       return 'Esta conta foi desativada. Fale com o administrador.'
     case 'auth/operation-not-allowed':
       return 'O login por e-mail ainda não está habilitado no Firebase.'
+    case 'auth/missing-password':
+      return 'Informe sua senha para continuar.'
+    case 'auth/network-request-failed':
+      return 'Não foi possível conectar ao Firebase. Verifique sua internet.'
     case 'auth/too-many-requests':
       return 'Muitas tentativas. Aguarde alguns minutos e tente novamente.'
     default:
