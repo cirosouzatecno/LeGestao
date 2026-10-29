@@ -9,7 +9,7 @@ import {
   GoogleAuthProvider,
   signOut as fbSignOut,
 } from 'firebase/auth'
-import { auth, validateFirestoreConnection } from '@/lib/firebase'
+import { getAuthInstance, validateFirestoreConnection } from '@/lib/firebase'
 
 interface FirebaseContextType {
   user: User | null
@@ -37,7 +37,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     validateFirestoreConnection().then(setConnected)
 
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(getAuthInstance(), (currentUser) => {
       setUser(currentUser)
       setLoading(false)
     })
@@ -47,16 +47,16 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider()
-    await signInWithPopup(auth, provider)
+    await signInWithPopup(getAuthInstance(), provider)
   }
 
   const signInWithEmail = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(auth, email.trim(), password)
+    await signInWithEmailAndPassword(getAuthInstance(), email.trim(), password)
   }
 
   const signOut = async () => {
     try {
-      await fbSignOut(auth)
+      await fbSignOut(getAuthInstance())
     } catch (err) {
       console.error('Falha ao desconectar:', err)
     }

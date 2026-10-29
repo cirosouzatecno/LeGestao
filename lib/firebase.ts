@@ -1,4 +1,4 @@
-﻿import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app'
+import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app'
 import { getAuth, type Auth } from 'firebase/auth'
 import { getFirestore, type Firestore, doc, getDocFromServer } from 'firebase/firestore'
 
@@ -12,6 +12,8 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
   firestoreDatabaseId: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID,
 }
+
+const firestoreDatabaseId = firebaseConfig.firestoreDatabaseId
 
 let appInstance: FirebaseApp | null = null
 let authInstance: Auth | null = null
@@ -36,20 +38,21 @@ export function getAuthInstance(): Auth {
 
 export function getDbInstance(): Firestore {
   if (!dbInstance) {
-    dbInstance = getFirestore(getFirebaseApp(), firebaseConfig.firestoreDatabaseId)
+    const app = getFirebaseApp()
+    dbInstance = firestoreDatabaseId ? getFirestore(app, firestoreDatabaseId) : getFirestore(app)
   }
   return dbInstance
 }
 
 export const auth = new Proxy({} as Auth, {
-  get(_target, prop) {
-    return getAuthInstance()[prop]
+  get(_target, prop, receiver) {
+    return Reflect.get(getAuthInstance(), prop, receiver)
   }
 })
 
 export const db = new Proxy({} as Firestore, {
-  get(_target, prop) {
-    return getDbInstance()[prop]
+  get(_target, prop, receiver) {
+    return Reflect.get(getDbInstance(), prop, receiver)
   }
 })
 

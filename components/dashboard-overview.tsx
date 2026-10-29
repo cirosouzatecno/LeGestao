@@ -10,7 +10,7 @@ import {
   query,
   orderBy,
 } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
+import { getDbInstance } from '@/lib/firebase'
 import { useFirebase } from './firebase-provider'
 import {
   Calendar,
@@ -221,7 +221,8 @@ export function DashboardOverview({ className = '' }: { className?: string }) {
     let unsubTeam: (() => void) | undefined
 
     try {
-      const eventsRef = collection(db, 'events')
+      const firestore = getDbInstance()
+      const eventsRef = collection(firestore, 'events')
       unsubEvents = onSnapshot(
         eventsRef,
         (snapshot) => {
@@ -240,7 +241,7 @@ export function DashboardOverview({ className = '' }: { className?: string }) {
         }
       )
 
-      const invRef = collection(db, 'inventory')
+      const invRef = collection(firestore, 'inventory')
       unsubInventory = onSnapshot(
         invRef,
         (snapshot) => {
@@ -256,7 +257,7 @@ export function DashboardOverview({ className = '' }: { className?: string }) {
         }
       )
 
-      const teamRef = collection(db, 'team')
+      const teamRef = collection(firestore, 'team')
       unsubTeam = onSnapshot(
         teamRef,
         (snapshot) => {
@@ -331,24 +332,30 @@ export function DashboardOverview({ className = '' }: { className?: string }) {
 
   // Seed sample data to Firestore
   const handleSeedData = async () => {
+    if (!user) {
+      showToast('Faça login com uma conta Firebase para gravar dados no Firestore.')
+      return
+    }
+
     setSeeding(true)
+    const firestore = getDbInstance()
     try {
       // Seed events
       for (const ev of SAMPLE_EVENTS) {
-        await setDoc(doc(db, 'events', ev.id), ev)
+        await setDoc(doc(firestore, 'events', ev.id), ev)
       }
       // Seed inventory
       for (const inv of SAMPLE_INVENTORY) {
-        await setDoc(doc(db, 'inventory', inv.id), inv)
+        await setDoc(doc(firestore, 'inventory', inv.id), inv)
       }
       // Seed team
       for (const tm of SAMPLE_TEAM) {
-        await setDoc(doc(db, 'team', tm.id), tm)
+        await setDoc(doc(firestore, 'team', tm.id), tm)
       }
       showToast('Dados de demonstração sincronizados com o Firestore com sucesso!')
     } catch (err: unknown) {
       console.error('Erro ao semear dados no Firestore:', err)
-      showToast('Para sincronizar com o Firestore, faça login com o Google acima.')
+      showToast('Não foi possível gravar no Firestore. Verifique as permissões da sua conta.')
     } finally {
       setSeeding(false)
     }
@@ -356,8 +363,14 @@ export function DashboardOverview({ className = '' }: { className?: string }) {
 
   // Handle Event Status Change
   const handleUpdateEventStatus = async (eventId: string, newSt: EventItem['status']) => {
+    if (!user) {
+      showToast('Faça login com uma conta Firebase para atualizar eventos.')
+      return
+    }
+
+    const firestore = getDbInstance()
     try {
-      await updateDoc(doc(db, 'events', eventId), {
+      await updateDoc(doc(firestore, 'events', eventId), {
         status: newSt,
         updatedAt: new Date().toISOString(),
       })
@@ -373,9 +386,15 @@ export function DashboardOverview({ className = '' }: { className?: string }) {
 
   // Quick Restock (+10)
   const handleRestock = async (itemId: string, currentQty: number) => {
+    if (!user) {
+      showToast('Faça login com uma conta Firebase para atualizar o estoque.')
+      return
+    }
+
     const updated = currentQty + 10
+    const firestore = getDbInstance()
     try {
-      await updateDoc(doc(db, 'inventory', itemId), {
+      await updateDoc(doc(firestore, 'inventory', itemId), {
         quantity: updated,
         updatedAt: new Date().toISOString(),
       })
@@ -393,6 +412,10 @@ export function DashboardOverview({ className = '' }: { className?: string }) {
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newTitle.trim()) return
+    if (!user) {
+      showToast('Faça login com uma conta Firebase para criar eventos.')
+      return
+    }
 
     const id = `evt-${Date.now().toString(36)}`
     const newEvent: EventItem = {
@@ -406,8 +429,9 @@ export function DashboardOverview({ className = '' }: { className?: string }) {
       createdAt: new Date().toISOString(),
     }
 
+    const firestore = getDbInstance()
     try {
-      await setDoc(doc(db, 'events', id), newEvent)
+      await setDoc(doc(firestore, 'events', id), newEvent)
       showToast('Novo evento salvo com sucesso no Firestore!')
     } catch (err) {
       console.warn('Adicionando evento localmente:', err)
@@ -423,7 +447,7 @@ export function DashboardOverview({ className = '' }: { className?: string }) {
   }
 
   return (
-    <div className={`legestao-dashboard-container min-h-[calc(100vh-1.5rem)] overflow-hidden bg-[#080b09]/95 text-[#e8ebe9] p-4 sm:p-6 lg:p-8 rounded-[1.25rem] border border-[#233127] shadow-[0_24px_80px_rgba(0,0,0,0.35)] relative ${className}`}>
+    <div aria-busy={loading} className={`legestao-dashboard-container min-h-[calc(100vh-1.5rem)] overflow-hidden bg-[#080b09]/95 text-[#e8ebe9] p-4 sm:p-6 lg:p-8 rounded-[1.25rem] border border-[#233127] shadow-[0_24px_80px_rgba(0,0,0,0.35)] relative ${className}`}>
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#16241b] border border-[#c5a059] text-[#f2f5f3] px-5 py-3 rounded-xl shadow-2xl text-xs sm:text-sm font-medium flex items-center gap-3 backdrop-blur-md animate-in fade-in slide-in-from-bottom-4">
@@ -445,7 +469,7 @@ export function DashboardOverview({ className = '' }: { className?: string }) {
             </span>
             <span className={`flex items-center gap-1 text-[11px] border px-2 py-0.5 rounded-full font-mono ${connected ? 'text-emerald-300 bg-emerald-950/60 border-emerald-800/40' : 'text-amber-300 bg-amber-950/40 border-amber-800/40'}`}>
               <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${connected ? 'bg-emerald-400' : 'bg-amber-400'}`} />
-              {connected ? 'Firestore Live' : 'Modo demonstração'}
+              {connected ? (user ? 'Firestore Live' : 'Firestore leitura') : 'Modo demonstração'}
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-white tracking-tight">
